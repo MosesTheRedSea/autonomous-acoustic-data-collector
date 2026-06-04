@@ -9,8 +9,6 @@ class Controller : public rclcpp::Node
 public:
     Controller() : Node("controller")
     {
-
-        
         cmd_pub_ = create_publisher<geometry_msgs::msg::Twist>("/cmd_vel", 10);
 
         goal_sub_ = create_subscription<geometry_msgs::msg::PoseStamped>(
@@ -25,25 +23,33 @@ public:
             std::chrono::milliseconds(50),
             std::bind(&Controller::controlLoop, this));
 
+        goal_reached_pub = create_publisher<std_msgs::msg::Bool>("/goal_reached", 10);
+
         RCLCPP_INFO(get_logger(), "Controller node started");
     }
 
 private:
+
     geometry_msgs::msg::PoseStamped goal_;
     nav_msgs::msg::Odometry odom_;
+
     bool has_goal_ = false;
     bool has_odom_ = false;
 
     rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr cmd_pub_;
     rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr goal_sub_;
+
     rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr odom_sub_;
+
     rclcpp::TimerBase::SharedPtr timer_;
+    rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr goal_reached_pub;
 
     void goalCallback(const geometry_msgs::msg::PoseStamped::SharedPtr msg)
     {
         goal_ = *msg;
         has_goal_ = true;
     }
+
 
     void odomCallback(const nav_msgs::msg::Odometry::SharedPtr msg)
     {
@@ -74,11 +80,20 @@ private:
         if (distance < 0.25) {
             cmd.linear.x = 0.0;
             cmd.angular.z = 0.0;
+
+            cmd_pub->publish(cmd);
+
+            auto reached = std_msgs::msg::Bool();
+            reached.data = true
+
+            goal_reached_pub->publish(reached);
+
             has_goal_ = false;  // so next goal will be accepted
+                                //
             return;
         }
 
-        cmd_pub_->publish(cmd);
+        
     }
 
     double getYaw(const geometry_msgs::msg::Quaternion &q)

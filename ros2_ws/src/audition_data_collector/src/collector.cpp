@@ -12,7 +12,8 @@ public:
     current_status_pub = create_publisher<audition_msgs::msg::CollectionStatus>("/collection_status", 10);
 
     proceed_pub = create_publisher<std_msgs::msg::Bool>("/proceed_command", 10);
-    proceed_sub = create_subscription<std_msgs::msg::Bool>("/proceed_command", 10, std::bind(&Collector::proceedCallback, this, std::placeholders::_1));
+    
+    // proceed_sub = create_subscription<std_msgs::msg::Bool>("/proceed_command", 10, std::bind(&Collector::proceedCallback, this, std::placeholders::_1));
 
     waypoint_sub = create_subscription<audition_msgs::msg::CollectionStatus>("/current_waypoint", 10, std::bind(&Collector::waypointCallback, this, std::placeholders::_1));
     
@@ -83,7 +84,7 @@ private:
     }
   }
 
-  // 
+  /* 
   void proceedCallback(const std_msgs::msg::Bool::ConstSharedPtr msg)
   {
     // If we're not given the message to proceed 
@@ -100,6 +101,7 @@ private:
     state = State::IDLE;
     publishStatus();
   }
+  */
 
   // This updates robot information and publishes it so we can grab that info
   void publishStatus()

@@ -36,11 +36,13 @@ public:
 
     loadWaypoints();
 
-    state = State::WAITING;
-    waiting = true;
     current_index = 0;
 
-    // sendNextGoal();
+    waiting = false;
+
+    state = State::NAVIGATING;
+
+    sendNextGoal();
 
     RCLCPP_INFO(get_logger(), "Waypoint manager ready — %zu waypoints loaded", waypoints.size());
   }
@@ -75,9 +77,34 @@ private:
       wp.yaw   = yaws[i];
       waypoints.push_back(wp);
 
+      if (
+          labels.size() != xs.size() ||
+          labels.size() != ys.size() ||
+          labels.size() != yaws.size())
+      {
+        throw std::runtime_error("Waypoint parameter sizes mismatch");
+      }
+
       RCLCPP_INFO(get_logger(), "Loaded waypoint [%d] — %s (%.2f, %.2f)",
                   wp.id, wp.label.c_str(), wp.x, wp.y);
     }
+  }
+
+  void goalReachedCallback(const std_msgs::msg::Bool::ConstSharedPtr msg) {
+
+    if (!msg->data)
+      return;
+      
+    state = State::WAITING;
+
+    waiting = true;
+
+    publishCurrentWaypoint();
+
+    RCLCPP_INFO(get_logger(), "Arrived at waypoint %zu", current_index);
+
+    publishCurrentWaypoint();
+
   }
 
   void sendNextGoal()
@@ -108,12 +135,9 @@ private:
     goal.pose.orientation.z = std::sin(wp.yaw / 2.0);
     goal.pose.orientation.w = std::cos(wp.yaw / 2.0);
 
-    goal_pub->publish(goal);
-
     state = State::WAITING;
     waiting = true;
   
-    publishCurrentWaypoint();
   
   }
 
@@ -125,22 +149,18 @@ private:
           return;
       }
 
-      // FIRST EVER COMMAND starts navigation
-      if (state == State::DONE || (current_index == 0 && !waiting)) {
-          RCLCPP_INFO(get_logger(), "Starting waypoint navigation");
-          state = State::WAITING;
-          waiting = false;
-          sendNextGoal();
+      if (state != State::WAITING {
+          RCLCPP_INFO(get_logger(), "Proceed received while not waiting");
           return;
       }
 
-      // Normal step progression
-      if (msg->data && state == State::WAITING) {
-          RCLCPP_INFO(get_logger(), "Proceed received — moving to next waypoint");
-          waiting = false;
-          current_index++;
-          sendNextGoal();
-      }
+      current_index++;
+
+      RCLCPP_INFO(get_logger(), "Proceed received — moving to next waypoint %zu", current_index);
+      waiting = false;
+          
+      sendNextGoal();
+      
   }
 
   void publishCurrentWaypoint()

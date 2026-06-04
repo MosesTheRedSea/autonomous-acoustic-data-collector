@@ -22,7 +22,7 @@ public:
     declare_parameter("output_dir", "/tmp/bags");
 
     trigger_sub = create_subscription<std_msgs::msg::Bool>(
-      "/record_trigger", 10,
+      "/start_record", 10,
       std::bind(&Recorder::triggerCallback, this, std::placeholders::_1));
 
     depth_sub = create_subscription<sensor_msgs::msg::Image>(
@@ -40,8 +40,12 @@ public:
     pointcloud_sub = create_subscription<sensor_msgs::msg::PointCloud2>(
       "/camera/depth/points", 10,
       std::bind(&Recorder::pointcloudCallback, this, std::placeholders::_1));
+  
+    recording_complete_pub = create_publisher<std_msgs::msg::Bool>("/recording_complete", 10);
 
     RCLCPP_INFO(get_logger(), "Recorder ready");
+
+
   }
 
 private:
@@ -53,6 +57,8 @@ private:
   rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr color_sub;
   rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr scan_sub;
   rclcpp::Subscription<sensor_msgs::msg::PointCloud2>::SharedPtr pointcloud_sub;
+
+  rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr recording_complete_pub;
 
   void triggerCallback(const std_msgs::msg::Bool::ConstSharedPtr msg)
   {
@@ -115,6 +121,12 @@ private:
   {
     writer.reset();
     recording = false;
+
+    auto msg = std_msgs::msg::Bool():
+    msg.data = true;
+
+    recording_complete_pub->publish(msg);
+
     RCLCPP_INFO(get_logger(), "Recording stopped");
   }
 
