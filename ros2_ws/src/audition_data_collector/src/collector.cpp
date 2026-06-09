@@ -70,17 +70,27 @@ private:
   {
 
     if (msg->data && state == State::RECORDING) {
-        RCLCPP_INFO(get_logger(), "Acoustic recording complete — stopping bag and proceeding");
+        RCLCPP_INFO(get_logger(),
+        "Recording complete — waiting for operator proceed command");
 
         auto trigger = std_msgs::msg::Bool();
         trigger.data = false;
         start_recording_pub->publish(trigger);
+
         state = State::IDLE;
-        auto proceed = std_msgs::msg::Bool();
-        proceed.data = true;
-        proceed_pub->publish(proceed);
-        
+
         publishStatus();
+        // RCLCPP_INFO(get_logger(), "Acoustic recording complete — stopping bag and proceeding");
+
+        // auto trigger = std_msgs::msg::Bool();
+        // trigger.data = false;
+        // start_recording_pub->publish(trigger);
+        // state = State::IDLE;
+        // auto proceed = std_msgs::msg::Bool();
+        // proceed.data = true;
+        // //proceed_pub->publish(proceed);
+        
+        // publishStatus();
     }
   }
 

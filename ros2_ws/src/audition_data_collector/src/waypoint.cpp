@@ -33,6 +33,13 @@ public:
     waypoint_pub = create_publisher<audition_msgs::msg::CollectionStatus>("/current_waypoint", 10);
     proceed_sub = create_subscription<std_msgs::msg::Bool>("/proceed_command", 10, std::bind(&Waypoint_Navigation::proceedCallback, this, std::placeholders::_1));
     goal_pub = create_publisher<geometry_msgs::msg::PoseStamped>("/goal_pose", 10);
+    goal_reached_sub = create_subscription<std_msgs::msg::Bool>(
+      "/goal_reached",
+      10,
+      std::bind(&Waypoint_Navigation::goalReachedCallback,
+                this,
+                std::placeholders::_1));
+    
 
     loadWaypoints();
 
@@ -42,7 +49,9 @@ public:
 
     state = State::NAVIGATING;
 
-    sendNextGoal();
+    start_timer_ = create_wall_timer(
+      std::chrono::seconds(1),
+      std::bind(&Waypoint_Navigation::startNavigation, this));
 
     RCLCPP_INFO(get_logger(), "Waypoint manager ready — %zu waypoints loaded", waypoints.size());
   }
@@ -60,6 +69,8 @@ private:
   rclcpp::Publisher<audition_msgs::msg::CollectionStatus>::SharedPtr waypoint_pub;
   rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr proceed_sub;
   rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr goal_pub;
+  rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr goal_reached_sub;
+  rclcpp::TimerBase::SharedPtr start_timer_;
 
   void loadWaypoints()
   {
@@ -90,25 +101,50 @@ private:
     }
   }
 
+  void startNavigation()
+  {
+    start_timer_->cancel();  // run only once
+
+    RCLCPP_INFO(get_logger(), "Starting navigation...");
+    sendNextGoal();
+  }
+
   void goalReachedCallback(const std_msgs::msg::Bool::ConstSharedPtr msg) {
 
     if (!msg->data)
       return;
-      
+    
+    // state = State::WAITING;
+    // waiting = true;
+
+    // RCLCPP_INFO(get_logger(),
+    //         "Arrived at waypoint %zu/%zu",
+    //         current_index + 1,
+    //         waypoints.size());
+
+    // publishCurrentWaypoint();
+
+    if (state != State::NAVIGATING) {
+      RCLCPP_WARN(get_logger(),
+                  "Goal reached received but not navigating");
+      return;
+    }
+  
     state = State::WAITING;
-
     waiting = true;
-
-    publishCurrentWaypoint();
-
-    RCLCPP_INFO(get_logger(), "Arrived at waypoint %zu", current_index);
-
+  
+    RCLCPP_INFO(get_logger(),
+                "Arrived at waypoint %zu/%zu",
+                current_index + 1,
+                waypoints.size());
+  
     publishCurrentWaypoint();
 
   }
 
   void sendNextGoal()
   {
+
     if (current_index >= waypoints.size()) {
       RCLCPP_INFO(get_logger(), "All %zu waypoints complete — session finished",
                   waypoints.size());
@@ -135,30 +171,51 @@ private:
     goal.pose.orientation.z = std::sin(wp.yaw / 2.0);
     goal.pose.orientation.w = std::cos(wp.yaw / 2.0);
 
-    state = State::WAITING;
-    waiting = true;
-  
-  
+    state = State::NAVIGATING;
+    waiting = false;
+
+    goal_pub->publish(goal);
+    
   }
 
   void proceedCallback(const std_msgs::msg::Bool::ConstSharedPtr msg)
   {
-      if (!msg->data) {
-          RCLCPP_WARN(get_logger(), "Abort signal received — stopping session");
-          state = State::DONE;
-          return;
-      }
+      // if (!msg->data) {
+      //     RCLCPP_WARN(get_logger(), "Abort signal received — stopping session");
+      //     state = State::DONE;
+      //     return;
+      // }
 
-      if (state != State::WAITING {
-          RCLCPP_INFO(get_logger(), "Proceed received while not waiting");
-          return;
-      }
+      // if (state != State::WAITING) {
+      //     RCLCPP_INFO(get_logger(), "Proceed received while not waiting");
+      //     return;
+      // }
 
-      current_index++;
+      // current_index++;
 
-      RCLCPP_INFO(get_logger(), "Proceed received — moving to next waypoint %zu", current_index);
-      waiting = false;
+      // RCLCPP_INFO(get_logger(), "Proceed received — moving to next waypoint %zu", current_index);
+      // waiting = false;
           
+      // sendNextGoal();
+
+      if (!msg->data) {
+        RCLCPP_WARN(get_logger(), "Abort signal received");
+        state = State::DONE;
+        return;
+      }
+    
+      if (state != State::WAITING) {
+        RCLCPP_WARN(get_logger(),
+                    "Proceed received but not in WAITING state");
+        return;
+      }
+    
+      current_index++;
+    
+      RCLCPP_INFO(get_logger(),
+                  "Proceeding to waypoint %zu",
+                  current_index + 1);
+    
       sendNextGoal();
       
   }

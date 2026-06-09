@@ -2,6 +2,7 @@
 #include "geometry_msgs/msg/twist.hpp"
 #include "geometry_msgs/msg/pose_stamped.hpp"
 #include "nav_msgs/msg/odometry.hpp"
+#include "std_msgs/msg/bool.hpp"
 #include <cmath>
 
 class Controller : public rclcpp::Node
@@ -81,10 +82,10 @@ private:
             cmd.linear.x = 0.0;
             cmd.angular.z = 0.0;
 
-            cmd_pub->publish(cmd);
+            cmd_pub_->publish(cmd);
 
             auto reached = std_msgs::msg::Bool();
-            reached.data = true
+            reached.data = true;
 
             goal_reached_pub->publish(reached);
 

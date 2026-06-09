@@ -122,7 +122,7 @@ private:
     writer.reset();
     recording = false;
 
-    auto msg = std_msgs::msg::Bool():
+    auto msg = std_msgs::msg::Bool();
     msg.data = true;
 
     recording_complete_pub->publish(msg);
