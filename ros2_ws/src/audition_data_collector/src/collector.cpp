@@ -41,6 +41,8 @@ private:
 
   rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr recording_complete_sub;
 
+  rclcpp::TimerBase::SharedPtr record_timer_;
+
   void waypointCallback(const audition_msgs::msg::CollectionStatus::ConstSharedPtr msg)
   {
 
@@ -62,8 +64,20 @@ private:
 
     start_recording_pub->publish(trigger);
 
+    record_timer_ = create_wall_timer(
+      std::chrono::seconds(10),  // or whatever duration you want
+      std::bind(&Collector::onRecordTimeout, this));
+
     publishStatus();
 
+  }
+
+  // New method:
+  void onRecordTimeout() {
+    record_timer_->cancel();
+    auto trigger = std_msgs::msg::Bool();
+    trigger.data = false;
+    start_recording_pub->publish(trigger);  // tells recorder to stop → triggers recording_complete
   }
 
   void recordingCompleteCallback(const std_msgs::msg::Bool::ConstSharedPtr msg)

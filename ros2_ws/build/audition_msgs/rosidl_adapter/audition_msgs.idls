@@ -1,4 +1,0 @@
-/home/moses/moses-research/ros2-robot-audition-suite/ros2_ws/build/audition_msgs/rosidl_adapter/audition_msgs:msg/CollectionStatus.idl
-/home/moses/moses-research/ros2-robot-audition-suite/ros2_ws/build/audition_msgs/rosidl_adapter/audition_msgs:srv/ProceedToNext.idl
-/home/moses/moses-research/ros2-robot-audition-suite/ros2_ws/build/audition_msgs/rosidl_adapter/audition_msgs:srv/AbortSession.idl
-/home/moses/moses-research/ros2-robot-audition-suite/ros2_ws/build/audition_msgs/rosidl_adapter/audition_msgs:action/CollectAtWaypoint.idl

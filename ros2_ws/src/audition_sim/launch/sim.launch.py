@@ -101,13 +101,13 @@ def generate_launch_description():
                 }],
                 output='screen'
             ),
-        ]),
-
-        TimerAction(period=8.0, actions=[
             Node(
                 package='rviz2',
                 executable='rviz2',
+                # ADD THIS PARAMETER
+                parameters=[{'use_sim_time': True}], 
                 output='screen'
             ),
         ]),
+
     ])

@@ -74,11 +74,18 @@ private:
         geometry_msgs::msg::Twist cmd;
 
         // Simple proportional controller
-        cmd.linear.x = 0.5 * distance;
-        cmd.angular.z = 2.0 * angle_error;
+        if (std::abs(angle_error) > 0.3) {
+            cmd.linear.x = 0.0;          
+            cmd.angular.z = 2.0 * angle_error;
+        } else {
+            cmd.linear.x = 0.5 * distance;
+            cmd.angular.z = 2.0 * angle_error;
+        }
+
+        RCLCPP_INFO(get_logger(), "distance = %.2f", distance);
 
         // Stop condition
-        if (distance < 0.25) {
+        if (distance < 0.25 && std::abs(angle_error) < 0.2) {
             cmd.linear.x = 0.0;
             cmd.angular.z = 0.0;
 
@@ -90,11 +97,11 @@ private:
             goal_reached_pub->publish(reached);
 
             has_goal_ = false;  // so next goal will be accepted
-                                //
             return;
         }
 
-        
+        cmd_pub_->publish(cmd);
+
     }
 
     double getYaw(const geometry_msgs::msg::Quaternion &q)

@@ -1,8 +1,0 @@
-source;share/audition_data_collector/hook/cmake_prefix_path.ps1
-source;share/audition_data_collector/hook/cmake_prefix_path.dsv
-source;share/audition_data_collector/hook/cmake_prefix_path.sh
-source;share/audition_data_collector/local_setup.bash
-source;share/audition_data_collector/local_setup.dsv
-source;share/audition_data_collector/local_setup.ps1
-source;share/audition_data_collector/local_setup.sh
-source;share/audition_data_collector/local_setup.zsh

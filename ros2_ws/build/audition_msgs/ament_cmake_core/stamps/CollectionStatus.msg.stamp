@@ -1,7 +1,0 @@
-std_msgs/Header header
-int32 current_waypoint_id
-string current_waypoint_label
-string state
-bool recording
-int32 total_waypoints
-int32 completed_waypoints

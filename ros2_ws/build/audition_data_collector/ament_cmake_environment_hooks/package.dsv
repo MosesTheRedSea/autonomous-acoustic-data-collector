@@ -1,4 +1,0 @@
-source;share/audition_data_collector/local_setup.bash
-source;share/audition_data_collector/local_setup.dsv
-source;share/audition_data_collector/local_setup.sh
-source;share/audition_data_collector/local_setup.zsh
