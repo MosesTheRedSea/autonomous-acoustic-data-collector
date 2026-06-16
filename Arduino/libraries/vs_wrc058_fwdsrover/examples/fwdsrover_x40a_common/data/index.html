@@ -1,0 +1,205 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><meta http-equiv="content-type" content="text/html; charset=UTF-8"><meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1">
+<title>Megarover Controller</title>
+<style>
+.container {
+  display: grid;
+  grid-gap: 10px;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 100px 100px 100px 50px, 50px, 50px;
+}
+
+button {
+  font-size:18px;
+  text-align: center;
+  line-height: 100px;
+}
+
+div {
+  font-size:18px;
+}
+
+.func {
+  background: #f0e68c;
+  border-color: #daa520#fa0;
+}
+
+.ten {
+  background-color: #add8e6;
+  border-color: #4682b4;
+}
+
+.stop {
+  background: #ffb6c1;
+  border-color: #db7093;
+}
+
+.label {
+  grid-column: 1 / 2;
+  background: #66cdaa;
+  border-color: #2f4f4f;
+  text-align: center;
+  line-height: 46px;
+}
+
+.value {
+  grid-column: 2 / 4;
+  background: #66cdaa;
+  border-color: #2f4f4f;
+  text-align: center;
+  line-height: 46px;
+}
+
+body {
+  padding: 10px;
+  font-family: sans-serif;
+}
+</style>
+</head>
+
+<body>
+
+  <div class="container">
+    <button class="func"  onClick=sendF1() id="f1">GO 1m</button>
+    <button class="ten" id="go">GO</button>
+    <button class="func" onClick=sendF2() id="f2">BACK 1m</button>
+    <button class="ten" id="left">LEFT</button>
+    <button class="stop" onClick=sendStop() id="stop">STOP</button>
+    <button class="ten" id="right">RIGHT</button>
+    <button class="func" onClick=sendF3() id="f3">LEFT 90°</button>
+    <button class="ten" id="back">BACK</button>
+    <button class="func" onClick=sendF4() id="f4">RIGTH 90°</button>
+    <div class="label">Vin</div>
+    <div id="sens1" class="value">0</div>
+  </div>
+
+  <script>
+    var button_go    = document.getElementById("go");
+    var button_left  = document.getElementById("left");
+    var button_right = document.getElementById("right");
+    var button_back  = document.getElementById("back");
+
+    button_go.addEventListener("touchstart", function(){
+      send("/go/");
+    }, false);
+    button_go.addEventListener("touchend", function(){
+      send("/stop/");
+    }, false);
+    button_go.addEventListener("mousedown", function(){
+      send("/go/");
+    }, false);
+    button_go.addEventListener("mouseup", function(){
+      send("/stop/");
+    }, false);
+
+
+    button_left.addEventListener("touchstart", function(){
+      send("/left/");
+    }, false);
+    button_left.addEventListener("touchend", function(){
+      send("/stop/");
+    }, false);
+    button_left.addEventListener("mousedown", function(){
+      send("/left/");
+    }, false);
+    button_left.addEventListener("mouseup", function(){
+      send("/stop/");
+    }, false);
+
+
+    button_right.addEventListener("touchstart", function(){
+      send("/right/");
+    }, false);
+    button_right.addEventListener("touchend", function(){
+      send("/stop/");
+    }, false);
+    button_right.addEventListener("mousedown", function(){
+      send("/right/");
+    }, false);
+    button_right.addEventListener("mouseup", function(){
+      send("/stop/");
+    }, false);
+
+
+    button_back.addEventListener("touchstart", function(){
+      send("/back/");
+    }, false);
+    button_back.addEventListener("touchend", function(){
+      send("/stop/");
+    }, false);
+    button_back.addEventListener("mousedown", function(){
+      send("/back/");
+    }, false);
+    button_back.addEventListener("mouseup", function(){
+      send("/stop/");
+    }, false);
+
+    function sendGo(){
+      send("/go/");
+    }
+
+    function sendLeft(){
+      send("/left/");
+    }
+
+    function sendRight(){
+      send("/right/");
+    }
+
+    function sendBack(){
+      send("/back/");
+    }
+
+    function sendStop(){
+      send("/stop/");
+    }
+
+    function sendF1(){
+      send("/f1/");
+    }
+
+    function sendF2(){
+      send("/f2/");
+    }
+
+    function sendF3(){
+      send("/f3/");
+    }
+
+    function sendF4(){
+      send("/f4/");
+    }
+
+    function sendVin(){
+      send("/vin/");
+    }
+
+    var xhr = new XMLHttpRequest();
+
+    xhr.onreadystatechange = function() {
+
+      if(xhr.readyState == 4){
+        if( xhr.status == 200 || xhr.status == 304 ) {
+          var header = xhr.getResponseHeader('content-type');
+          
+          if(header == 'text/plain'){
+            var res = xhr.responseText;
+
+	          var sens_value = document.getElementById("sens1");
+	          sens_value.innerHTML = res;
+          }
+        }
+      }
+    };
+
+    function send(url){
+      xhr.open("GET", url, true);
+      xhr.send();
+    }
+
+    window.onload = function(){
+      sendVin();
+    }
+
+    </script>
+  </body>
+</html>

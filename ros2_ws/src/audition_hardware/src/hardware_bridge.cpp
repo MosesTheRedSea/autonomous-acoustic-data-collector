@@ -57,6 +57,8 @@ public:
 
         tcsetattr(serial_port_, TCSANOW, &tty);
 
+        sendRegister(0x10, 0x0F);
+
         subscription_ =
             this->create_subscription<geometry_msgs::msg::Twist>(
                 "/cmd_vel",
@@ -98,18 +100,37 @@ private:
             buffer);
     }
 
-    void cmdVelCallback(
-        const geometry_msgs::msg::Twist::ConstSharedPtr msg)
+    void cmdVelCallback(const geometry_msgs::msg::Twist::ConstSharedPtr msg)
     {
         double linear  = msg->linear.x;
         double angular = msg->angular.z;
 
-        int16_t xs = static_cast<int16_t>(linear * 1000.0);
-        int16_t zs = static_cast<int16_t>(angular * 1000.0);
+        // Convert to mm/s and mrad/s
+        int16_t xs = static_cast<int16_t>(linear  * 1000.0);   // m/s → mm/s
+        int16_t zs = static_cast<int16_t>(angular * 1000.0);   // rad/s → mrad/s
 
-        sendRegister(MS16_S_XS, xs);
-        sendRegister(MS16_S_ZS, zs);
+        sendRegister(0x90, xs);  // MS16_S_XS forward/back
+        sendRegister(0x94, zs);  // MS16_S_ZS rotation ← was 0x92, WRONG
     }
+
+    // void cmdVelCallback(
+    //     const geometry_msgs::msg::Twist::ConstSharedPtr msg)
+    // {
+    //     double linear  = msg->linear.x;
+    //     double angular = msg->angular.z;
+
+    //     const double wheel_separation = 0.35;  // metres — from your URDF
+
+    //     double left  = linear - (angular * wheel_separation / 2.0);
+    //     double right = linear + (angular * wheel_separation / 2.0);
+
+    //     char buffer[64];
+    //     snprintf(buffer, sizeof(buffer), "L%.3fR%.3f\n", left, right);
+
+    //     write(serial_port_, buffer, strlen(buffer));
+
+    //     RCLCPP_INFO(get_logger(), "Sent: %s", buffer);
+    // }
 
     int serial_port_;
 
