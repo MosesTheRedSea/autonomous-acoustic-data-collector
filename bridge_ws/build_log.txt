@@ -1,0 +1,196 @@
+Starting >>> ros1_bridge
+--- stderr: ros1_bridge
+CMake Warning at CMakeLists.txt:149 (add_executable):
+  Cannot generate a safe runtime search path for target static_bridge because
+  files in some directories may conflict with libraries in implicit
+  directories:
+
+    runtime library [libyaml-cpp.so.0.6] in /usr/lib/x86_64-linux-gnu may be hidden by files in:
+      /opt/ros/foxy/opt/yaml_cpp_vendor/lib
+    runtime library [liborocos-kdl.so.1.4] in /usr/lib may be hidden by files in:
+      /opt/ros/foxy/lib
+    runtime library [liburdfdom_sensor.so.1.0] in /usr/lib/x86_64-linux-gnu may be hidden by files in:
+      /opt/ros/foxy/lib/x86_64-linux-gnu
+    runtime library [liburdfdom_model_state.so.1.0] in /usr/lib/x86_64-linux-gnu may be hidden by files in:
+      /opt/ros/foxy/lib/x86_64-linux-gnu
+    runtime library [liburdfdom_model.so.1.0] in /usr/lib/x86_64-linux-gnu may be hidden by files in:
+      /opt/ros/foxy/lib/x86_64-linux-gnu
+    runtime library [liburdfdom_world.so.1.0] in /usr/lib/x86_64-linux-gnu may be hidden by files in:
+      /opt/ros/foxy/lib/x86_64-linux-gnu
+
+  Some of these libraries may not be found correctly.
+Call Stack (most recent call first):
+  CMakeLists.txt:195 (custom_executable)
+
+
+CMake Warning at CMakeLists.txt:149 (add_executable):
+  Cannot generate a safe runtime search path for target static_bridge because
+  there is a cycle in the constraint graph:
+
+    dir 0 is [/opt/ros/noetic/lib]
+      dir 2 must precede it due to runtime library [liburdf.so]
+    dir 1 is [/home/moses/moses-research/ros2-robot-audition-suite/bridge_ws/build/ros1_bridge]
+    dir 2 is [/opt/ros/foxy/lib]
+      dir 0 must precede it due to runtime library [libcv_bridge.so]
+    dir 3 is [/opt/ros/foxy/opt/yaml_cpp_vendor/lib]
+    dir 4 is [/opt/ros/foxy/lib/x86_64-linux-gnu]
+    dir 5 is [/opt/ros/foxy/opt/rviz_ogre_vendor/lib]
+
+  Some of these libraries may not be found correctly.
+Call Stack (most recent call first):
+  CMakeLists.txt:195 (custom_executable)
+
+
+CMake Warning at CMakeLists.txt:178 (add_library):
+  Cannot generate a safe runtime search path for target ros1_bridge because
+  files in some directories may conflict with libraries in implicit
+  directories:
+
+    runtime library [libyaml-cpp.so.0.6] in /usr/lib/x86_64-linux-gnu may be hidden by files in:
+      /opt/ros/foxy/opt/yaml_cpp_vendor/lib
+    runtime library [liborocos-kdl.so.1.4] in /usr/lib may be hidden by files in:
+      /opt/ros/foxy/lib
+    runtime library [liburdfdom_sensor.so.1.0] in /usr/lib/x86_64-linux-gnu may be hidden by files in:
+      /opt/ros/foxy/lib/x86_64-linux-gnu
+    runtime library [liburdfdom_model_state.so.1.0] in /usr/lib/x86_64-linux-gnu may be hidden by files in:
+      /opt/ros/foxy/lib/x86_64-linux-gnu
+    runtime library [liburdfdom_model.so.1.0] in /usr/lib/x86_64-linux-gnu may be hidden by files in:
+      /opt/ros/foxy/lib/x86_64-linux-gnu
+    runtime library [liburdfdom_world.so.1.0] in /usr/lib/x86_64-linux-gnu may be hidden by files in:
+      /opt/ros/foxy/lib/x86_64-linux-gnu
+
+  Some of these libraries may not be found correctly.
+
+
+CMake Warning at CMakeLists.txt:178 (add_library):
+  Cannot generate a safe runtime search path for target ros1_bridge because
+  there is a cycle in the constraint graph:
+
+    dir 0 is [/opt/ros/foxy/lib]
+      dir 1 must precede it due to runtime library [libcv_bridge.so]
+    dir 1 is [/opt/ros/noetic/lib]
+      dir 0 must precede it due to runtime library [liburdf.so]
+    dir 2 is [/opt/ros/foxy/opt/yaml_cpp_vendor/lib]
+    dir 3 is [/opt/ros/foxy/lib/x86_64-linux-gnu]
+    dir 4 is [/opt/ros/foxy/opt/rviz_ogre_vendor/lib]
+
+  Some of these libraries may not be found correctly.
+
+
+CMake Warning at CMakeLists.txt:149 (add_executable):
+  Cannot generate a safe runtime search path for target parameter_bridge
+  because files in some directories may conflict with libraries in implicit
+  directories:
+
+    runtime library [libyaml-cpp.so.0.6] in /usr/lib/x86_64-linux-gnu may be hidden by files in:
+      /opt/ros/foxy/opt/yaml_cpp_vendor/lib
+    runtime library [liborocos-kdl.so.1.4] in /usr/lib may be hidden by files in:
+      /opt/ros/foxy/lib
+    runtime library [liburdfdom_sensor.so.1.0] in /usr/lib/x86_64-linux-gnu may be hidden by files in:
+      /opt/ros/foxy/lib/x86_64-linux-gnu
+    runtime library [liburdfdom_model_state.so.1.0] in /usr/lib/x86_64-linux-gnu may be hidden by files in:
+      /opt/ros/foxy/lib/x86_64-linux-gnu
+    runtime library [liburdfdom_model.so.1.0] in /usr/lib/x86_64-linux-gnu may be hidden by files in:
+      /opt/ros/foxy/lib/x86_64-linux-gnu
+    runtime library [liburdfdom_world.so.1.0] in /usr/lib/x86_64-linux-gnu may be hidden by files in:
+      /opt/ros/foxy/lib/x86_64-linux-gnu
+
+  Some of these libraries may not be found correctly.
+Call Stack (most recent call first):
+  CMakeLists.txt:202 (custom_executable)
+
+
+CMake Warning at CMakeLists.txt:149 (add_executable):
+  Cannot generate a safe runtime search path for target parameter_bridge
+  because there is a cycle in the constraint graph:
+
+    dir 0 is [/opt/ros/noetic/lib]
+      dir 2 must precede it due to runtime library [liburdf.so]
+    dir 1 is [/home/moses/moses-research/ros2-robot-audition-suite/bridge_ws/build/ros1_bridge]
+    dir 2 is [/opt/ros/foxy/lib]
+      dir 0 must precede it due to runtime library [libcv_bridge.so]
+    dir 3 is [/opt/ros/foxy/opt/yaml_cpp_vendor/lib]
+    dir 4 is [/opt/ros/foxy/lib/x86_64-linux-gnu]
+    dir 5 is [/opt/ros/foxy/opt/rviz_ogre_vendor/lib]
+
+  Some of these libraries may not be found correctly.
+Call Stack (most recent call first):
+  CMakeLists.txt:202 (custom_executable)
+
+
+CMake Warning at CMakeLists.txt:149 (add_executable):
+  Cannot generate a safe runtime search path for target dynamic_bridge
+  because files in some directories may conflict with libraries in implicit
+  directories:
+
+    runtime library [libyaml-cpp.so.0.6] in /usr/lib/x86_64-linux-gnu may be hidden by files in:
+      /opt/ros/foxy/opt/yaml_cpp_vendor/lib
+    runtime library [liborocos-kdl.so.1.4] in /usr/lib may be hidden by files in:
+      /opt/ros/foxy/lib
+    runtime library [liburdfdom_sensor.so.1.0] in /usr/lib/x86_64-linux-gnu may be hidden by files in:
+      /opt/ros/foxy/lib/x86_64-linux-gnu
+    runtime library [liburdfdom_model_state.so.1.0] in /usr/lib/x86_64-linux-gnu may be hidden by files in:
+      /opt/ros/foxy/lib/x86_64-linux-gnu
+    runtime library [liburdfdom_model.so.1.0] in /usr/lib/x86_64-linux-gnu may be hidden by files in:
+      /opt/ros/foxy/lib/x86_64-linux-gnu
+    runtime library [liburdfdom_world.so.1.0] in /usr/lib/x86_64-linux-gnu may be hidden by files in:
+      /opt/ros/foxy/lib/x86_64-linux-gnu
+
+  Some of these libraries may not be found correctly.
+Call Stack (most recent call first):
+  CMakeLists.txt:209 (custom_executable)
+
+
+CMake Warning at CMakeLists.txt:149 (add_executable):
+  Cannot generate a safe runtime search path for target dynamic_bridge
+  because there is a cycle in the constraint graph:
+
+    dir 0 is [/opt/ros/noetic/lib]
+      dir 2 must precede it due to runtime library [liburdf.so]
+    dir 1 is [/home/moses/moses-research/ros2-robot-audition-suite/bridge_ws/build/ros1_bridge]
+    dir 2 is [/opt/ros/foxy/lib]
+      dir 0 must precede it due to runtime library [libcv_bridge.so]
+    dir 3 is [/opt/ros/foxy/opt/yaml_cpp_vendor/lib]
+    dir 4 is [/opt/ros/foxy/lib/x86_64-linux-gnu]
+    dir 5 is [/opt/ros/foxy/opt/rviz_ogre_vendor/lib]
+
+  Some of these libraries may not be found correctly.
+Call Stack (most recent call first):
+  CMakeLists.txt:209 (custom_executable)
+
+
+/usr/bin/ld: warning: libconsole_bridge.so.0.4, needed by /opt/ros/noetic/lib/libcpp_common.so, may conflict with libconsole_bridge.so.1.0
+---
+[Processing: ros1_bridge]
+[Processing: ros1_bridge]
+[Processing: ros1_bridge]
+[Processing: ros1_bridge]
+[Processing: ros1_bridge]
+[Processing: ros1_bridge]
+[Processing: ros1_bridge]
+[Processing: ros1_bridge]
+[Processing: ros1_bridge]
+[Processing: ros1_bridge]
+[Processing: ros1_bridge]
+[Processing: ros1_bridge]
+[Processing: ros1_bridge]
+[Processing: ros1_bridge]
+[Processing: ros1_bridge]
+[Processing: ros1_bridge]
+[Processing: ros1_bridge]
+[Processing: ros1_bridge]
+[Processing: ros1_bridge]
+[Processing: ros1_bridge]
+[Processing: ros1_bridge]
+[Processing: ros1_bridge]
+[Processing: ros1_bridge]
+[Processing: ros1_bridge]
+[Processing: ros1_bridge]
+[Processing: ros1_bridge]
+[Processing: ros1_bridge]
+[Processing: ros1_bridge]
+[Processing: ros1_bridge]
+Finished <<< ros1_bridge [14min 54s]
+
+Summary: 1 package finished [14min 55s]
+  1 package had stderr output: ros1_bridge
