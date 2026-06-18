@@ -181,21 +181,6 @@ The robot will autonomously:
 
 Data is saved to `/home/moses/audition_bags/`.
 
-## Topic Graph
-
-```
-/goal_pose         waypoint.cpp → controller.cpp
-/cmd_vel           controller.cpp → [bridge] → ESP32 → motors
-/current_waypoint  waypoint.cpp → collector.cpp
-/record_trigger    collector.cpp → acoustic_recorder.py
-/start_record      collector.cpp → recorder.cpp
-/recording_complete acoustic_recorder.py → collector.cpp
-/proceed_command   collector.cpp → waypoint.cpp (auto-proceed)
-/scan              YDLidar TG30 → slam_toolbox
-/map               slam_toolbox → (saved to file)
-/rover_twist       ros1_bridge relay → rosserial_python → ESP32
-```
-
 ## Manual Operator Override
 
 Even in autonomous mode, an operator can manually abort a session:
