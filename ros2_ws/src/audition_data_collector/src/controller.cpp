@@ -11,21 +11,13 @@ public:
     Controller() : Node("controller")
     {
         cmd_pub_ = create_publisher<geometry_msgs::msg::Twist>("/cmd_vel", 10);
-
-        goal_sub_ = create_subscription<geometry_msgs::msg::PoseStamped>(
-            "/goal_pose", 10,
-            std::bind(&Controller::goalCallback, this, std::placeholders::_1));
-
-        odom_sub_ = create_subscription<nav_msgs::msg::Odometry>(
-            "/odom", 10,
-            std::bind(&Controller::odomCallback, this, std::placeholders::_1));
-
-        timer_ = create_wall_timer(
-            std::chrono::milliseconds(50),
-            std::bind(&Controller::controlLoop, this));
-
         goal_reached_pub = create_publisher<std_msgs::msg::Bool>("/goal_reached", 10);
 
+        goal_sub_ = create_subscription<geometry_msgs::msg::PoseStamped>("/goal_pose", 10, std::bind(&Controller::goalCallback, this, std::placeholders::_1));
+        odom_sub_ = create_subscription<nav_msgs::msg::Odometry>("/odom", 10, std::bind(&Controller::odomCallback, this, std::placeholders::_1));
+
+        timer_ = create_wall_timer(std::chrono::milliseconds(50), std::bind(&Controller::controlLoop, this));
+        goal_reached_pub = create_publisher<std_msgs::msg::Bool>("/goal_reached", 10);
         RCLCPP_INFO(get_logger(), "Controller node started");
     }
 
