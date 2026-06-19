@@ -20,6 +20,8 @@ public:
     recording_complete_sub = create_subscription<std_msgs::msg::Bool>("/recording_complete", 10, std::bind(&Collector::recordingCompleteCallback, this, std::placeholders::_1));
 
     RCLCPP_INFO(get_logger(), "Collector node ready — waiting for waypoint arrival");
+
+    
   }
 
 private:
@@ -41,7 +43,7 @@ private:
 
   rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr recording_complete_sub;
 
-  rclcpp::TimerBase::SharedPtr record_timer_;
+  
 
   void waypointCallback(const audition_msgs::msg::CollectionStatus::ConstSharedPtr msg)
   {
@@ -64,36 +66,39 @@ private:
 
     start_recording_pub->publish(trigger);
 
-    record_timer_ = create_wall_timer(
-      std::chrono::seconds(10),  // or whatever duration you want
-      std::bind(&Collector::onRecordTimeout, this));
+    RCLCPP_INFO(
+        get_logger(),
+        "Waiting for recorder to finish..."
+    );
 
     publishStatus();
 
   }
 
-  // New method:
-  void onRecordTimeout() {
-    record_timer_->cancel();
-    auto trigger = std_msgs::msg::Bool();
-    trigger.data = false;
-    start_recording_pub->publish(trigger);  // tells recorder to stop → triggers recording_complete
-  }
-
   void recordingCompleteCallback(const std_msgs::msg::Bool::ConstSharedPtr msg)
   {
+    if (!msg->data) {
+      return;
+    }
 
-    if (msg->data && state == State::RECORDING) {
-        RCLCPP_INFO(get_logger(),
-        "Recording complete — waiting for operator proceed command");
+    if (state != State:RECORDING) {
+      RCLCPP_WARN(
+          get_logger(),
+          "Received recrding complete while not recording"
+      );
+      return;
+    }
 
-        auto trigger = std_msgs::msg::Bool();
-        trigger.data = false;
-        start_recording_pub->publish(trigger);
+    RCLCPP_INFO(
+        get_logger(),
+        "Recording complete at waypoint [%s]",
+        current_waypoint->current_waypoint.c_str()
+    );
 
-        state = State::IDLE;
-
-        publishStatus();
+    state = State::IDLE;
+    
+    publishStatus();
+   
         // RCLCPP_INFO(get_logger(), "Acoustic recording complete — stopping bag and proceeding");
 
         // auto trigger = std_msgs::msg::Bool();

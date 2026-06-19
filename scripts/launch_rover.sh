@@ -38,3 +38,4 @@ tmux send-keys -t $SESSION:teleop \
 echo "Launched tmux session '$SESSION' with windows: roscore, rosserial, relay, bridge, teleop"
 echo "Attach with: tmux attach -t $SESSION"
 echo "Switch windows with Ctrl-b then window number (0-4), or Ctrl-b n for next"
+
