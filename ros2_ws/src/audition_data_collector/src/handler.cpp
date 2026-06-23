@@ -31,7 +31,7 @@ class Handler : public rclcpp::Node
 
         auto message = std_msgs::msg::Bool();  
         message.data = true;
-        proceed_pub->publish(message);
+        proceed_pub->publish(message); // publishes to /proceed_command
 
         RCLCPP_INFO(get_logger(), "Proceeding - : %s", request->operator_note.c_str());
 

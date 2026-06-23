@@ -10,13 +10,11 @@ public:
 
     start_recording_pub = create_publisher<std_msgs::msg::Bool>("/start_record", 10);
     current_status_pub = create_publisher<audition_msgs::msg::CollectionStatus>("/collection_status", 10);
-
     proceed_pub = create_publisher<std_msgs::msg::Bool>("/proceed_command", 10);
     
     // proceed_sub = create_subscription<std_msgs::msg::Bool>("/proceed_command", 10, std::bind(&Collector::proceedCallback, this, std::placeholders::_1));
 
     waypoint_sub = create_subscription<audition_msgs::msg::CollectionStatus>("/current_waypoint", 10, std::bind(&Collector::waypointCallback, this, std::placeholders::_1));
-    
     recording_complete_sub = create_subscription<std_msgs::msg::Bool>("/recording_complete", 10, std::bind(&Collector::recordingCompleteCallback, this, std::placeholders::_1));
 
     RCLCPP_INFO(get_logger(), "Collector node ready — waiting for waypoint arrival");
@@ -33,14 +31,11 @@ private:
 
   // These are publisher I made for recording, current_status and whether we should proceed to the next occlusion
   rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr start_recording_pub;
-
   rclcpp::Publisher<audition_msgs::msg::CollectionStatus>::SharedPtr current_status_pub;
-
   rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr proceed_pub;
+
   rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr proceed_sub;
-
   rclcpp::Subscription<audition_msgs::msg::CollectionStatus>::SharedPtr waypoint_sub;
-
   rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr recording_complete_sub;
 
   
@@ -64,7 +59,7 @@ private:
     auto trigger = std_msgs::msg::Bool();
     trigger.data = true;
 
-    start_recording_pub->publish(trigger);
+    start_recording_pub->publish(trigger);v // publishes to /start_record 
 
     RCLCPP_INFO(
         get_logger(),
@@ -84,7 +79,7 @@ private:
     if (state != State:RECORDING) {
       RCLCPP_WARN(
           get_logger(),
-          "Received recrding complete while not recording"
+          "Received recording complete while not recording"
       );
       return;
     }
@@ -92,11 +87,11 @@ private:
     RCLCPP_INFO(
         get_logger(),
         "Recording complete at waypoint [%s]",
+
         current_waypoint->current_waypoint.c_str()
     );
 
     state = State::IDLE;
-    
     publishStatus();
    
         // RCLCPP_INFO(get_logger(), "Acoustic recording complete — stopping bag and proceeding");
@@ -146,7 +141,7 @@ private:
       status.current_waypoint_label = current_waypoint->current_waypoint_label;
     }
 
-    current_status_pub->publish(status);
+    current_status_pub->publish(status); // publishes to /collection_status
   }
 };
 

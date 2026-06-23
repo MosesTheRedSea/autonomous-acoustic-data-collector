@@ -34,7 +34,7 @@ class AcousticRecorder(Node):
         self.declare_parameter('start_sample', 4900)
         self.declare_parameter('end_sample', 6000)
         
-        # Blue Tooth Speaker
+        # Blue Tooth Speaker - won't be needed since sound will play grom device itself.
         self.declare_parameter('speaker_device', None)
 
         # 16 Array Microphone
@@ -46,7 +46,7 @@ class AcousticRecorder(Node):
 
         self.channels = self.get_parameter('channels').value
         self.repeat = self.get_parameter('repeat').value
-        self.sleep_duration = self.gmet_parameter('sleep_duration').value
+        self.sleep_duration = self.get_parameter('sleep_duration').value
         self.start_sample = self.get_parameter('start_sample').value
         self.end_sample = self.get_parameter('end_sample').value
 
@@ -61,14 +61,9 @@ class AcousticRecorder(Node):
 
         self.load_excitation()
 
-        # subscribers
-        self.trigger_sub = self.create_subscription(
-            Bool, '/start_record',
-            self.trigger_callback, 10)
-
-        self.waypoint_sub = self.create_subscription(
-            CollectionStatus, '/current_waypoint',
-            self.waypoint_callback, 10)
+        # subscribers``
+        self.trigger_sub = self.create_subscription( Bool, '/start_record', self.trigger_callback, 10)
+        self.waypoint_sub = self.create_subscription(CollectionStatus, '/current_waypoint', self.waypoint_callback, 10)
 
         # publishers
         self.complete_pub = self.create_publisher(Bool, '/recording_complete', 10)
@@ -259,9 +254,9 @@ class AcousticRecorder(Node):
 
         self.get_logger().info(f'IR saved for {self.channels} channels — repeat {repeat_index+1}')
 
-def main(args=None):
-    rclpy.init(args=args)
-    node = AcousticRecorderNode()
+def main(args=None):
+    rclpy.init(args=args)
+    node = AcousticRecorder()
     rclpy.spin(node)
     rclpy.shutdown()
 

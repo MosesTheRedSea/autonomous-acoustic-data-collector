@@ -1,0 +1,49 @@
+waypoint_collector:
+  ros__parameters:
+    waypoints:
+
+      # Predefined 5m x 5m collection box.
+      # Robot starts at corner (0,0); box extends from (0,0) to (5,5).
+      # Four 182cm occluder panels, one centered on each wall (0.5m in
+      # from the wall). For each panel, the robot stops at 6 standoff
+      # distances: 0.5, 1.0, 1.5, 2.0, 2.5, 3.0 m, always facing the
+      # panel.
+      
+      # Panel centers:
+      #   north: (2.5, 4.5)  wall y=5
+      #   east:  (4.5, 2.5)  wall x=5
+      #   south: (2.5, 0.5)  wall y=0
+      #   west:  (0.5, 2.5)  wall x=0
+
+      labels: [
+        "north_0_5m", "north_1_0m", "north_1_5m", "north_2_0m", "north_2_5m", "north_3_0m",
+        "east_0_5m",  "east_1_0m",  "east_1_5m",  "east_2_0m",  "east_2_5m",  "east_3_0m",
+        "south_0_5m", "south_1_0m", "south_1_5m", "south_2_0m", "south_2_5m", "south_3_0m",
+        "west_0_5m",  "west_1_0m",  "west_1_5m",  "west_2_0m",  "west_2_5m",  "west_3_0m"
+      ]
+
+      x: [
+        2.5, 2.5, 2.5, 2.5, 2.5, 2.5,
+        4.0, 3.5, 3.0, 2.5, 2.0, 1.5,
+        2.5, 2.5, 2.5, 2.5, 2.5, 2.5,
+        1.0, 1.5, 2.0, 2.5, 3.0, 3.5
+      ]
+
+      y: [
+        4.0, 3.5, 3.0, 2.5, 2.0, 1.5,
+        2.5, 2.5, 2.5, 2.5, 2.5, 2.5,
+        1.0, 1.5, 2.0, 2.5, 3.0, 3.5,
+        2.5, 2.5, 2.5, 2.5, 2.5, 2.5
+      ]
+
+      # yaw = direction robot faces to look at the panel (radians)
+      #   north: yaw = 1.5708  (faces +y)
+      #   east:  yaw = 0.0     (faces +x)
+      #   south: yaw = -1.5708 (faces -y)
+      #   west:  yaw = 3.1416  (faces -x)
+      yaw: [
+        1.5708, 1.5708, 1.5708, 1.5708, 1.5708, 1.5708,
+        0.0,    0.0,    0.0,    0.0,    0.0,    0.0,
+       -1.5708,-1.5708,-1.5708,-1.5708,-1.5708,-1.5708,
+        3.1416, 3.1416, 3.1416, 3.1416, 3.1416, 3.1416
+      ]
