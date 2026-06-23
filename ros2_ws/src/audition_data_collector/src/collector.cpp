@@ -59,7 +59,7 @@ private:
     auto trigger = std_msgs::msg::Bool();
     trigger.data = true;
 
-    start_recording_pub->publish(trigger);v // publishes to /start_record 
+    start_recording_pub->publish(trigger); // publishes to /start_record 
 
     RCLCPP_INFO(
         get_logger(),

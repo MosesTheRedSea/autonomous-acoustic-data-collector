@@ -7,5 +7,4 @@ acoustic_recorder:
     sleep_duration: 3
     start_sample: 4900
     end_sample: 6000
-    mic_device: 5
-    speaker_device: 2
+    mic_device: 1
