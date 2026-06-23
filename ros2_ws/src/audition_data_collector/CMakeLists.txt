@@ -44,6 +44,7 @@ ament_target_dependencies(recorder ${dependencies})
 
 install(PROGRAMS
   scripts/acoustic_recorder.py
+  scripts/odom_integrator.py
   DESTINATION lib/${PROJECT_NAME}
 )
 

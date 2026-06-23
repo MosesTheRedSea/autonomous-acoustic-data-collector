@@ -31,27 +31,19 @@ public:
     declare_parameter("waypoints.yaw", std::vector<double>{});
   
     waypoint_pub = create_publisher<audition_msgs::msg::CollectionStatus>("/current_waypoint", 10);
-    proceed_sub = create_subscription<std_msgs::msg::Bool>("/proceed_command", 10, std::bind(&Waypoint_Navigation::proceedCallback, this, std::placeholders::_1));
     goal_pub = create_publisher<geometry_msgs::msg::PoseStamped>("/goal_pose", 10);
-    goal_reached_sub = create_subscription<std_msgs::msg::Bool>(
-      "/goal_reached",
-      10,
-      std::bind(&Waypoint_Navigation::goalReachedCallback,
-                this,
-                std::placeholders::_1));
-    
 
-    loadWaypoints();
+    proceed_sub = create_subscription<std_msgs::msg::Bool>("/proceed_command", 10, std::bind(&Waypoint_Navigation::proceedCallback, this, std::placeholders::_1));
+    goal_reached_sub = create_subscription<std_msgs::msg::Bool>("/goal_reached", 10, std::bind(&Waypoint_Navigation::goalReachedCallback, this, std::placeholders::_1));  
+
+    loadWaypoints(); // gives the robot the initial location to traverse to
 
     current_index = 0;
-
     waiting = false;
 
     state = State::NAVIGATING;
 
-    start_timer_ = create_wall_timer(
-      std::chrono::seconds(1),
-      std::bind(&Waypoint_Navigation::startNavigation, this));
+    start_timer_ = create_wall_timer(std::chrono::seconds(1), std::bind(&Waypoint_Navigation::startNavigation, this)); // we'll switch to using the actual microphone and speaker
 
     RCLCPP_INFO(get_logger(), "Waypoint manager ready — %zu waypoints loaded", waypoints.size());
   }
@@ -62,10 +54,11 @@ private:
   enum class State { NAVIGATING, WAITING, DONE };
 
   State state = State::NAVIGATING;
-  std::vector<Waypoint> waypoints;
+  std::vector<Waypoint> waypoints; // Multiple Wypoints the Robot will traverse to
   
   size_t current_index;
   bool waiting;
+
   rclcpp::Publisher<audition_msgs::msg::CollectionStatus>::SharedPtr waypoint_pub;
   rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr proceed_sub;
   rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr goal_pub;

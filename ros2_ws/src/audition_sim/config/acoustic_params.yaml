@@ -1,7 +1,7 @@
 acoustic_recorder:
   ros__parameters:
-    excitation_path: '/path/to/your/excitation.wav'
-    output_dir: '/home/moses/audition_bags/acoustic'
+    excitation_path: '/home/moses/moses-research/ros2-robot-audition-suite/excitation.wav'
+    output_dir: '/home/moses/moses-research/recorded_data'
     channels: 16
     repeat: 8
     sleep_duration: 3

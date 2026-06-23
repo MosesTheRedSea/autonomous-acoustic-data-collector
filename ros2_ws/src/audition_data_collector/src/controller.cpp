@@ -30,12 +30,12 @@ private:
     bool has_odom_ = false;
 
     rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr cmd_pub_;
-    rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr goal_sub_;
+    rclcpp::Publisher<std_msgs::msg::BOol>::SharedPtr goal_reached_pub;
 
+    rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr goal_sub_;
     rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr odom_sub_;
 
     rclcpp::TimerBase::SharedPtr timer_;
-    rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr goal_reached_pub;
 
     void goalCallback(const geometry_msgs::msg::PoseStamped::SharedPtr msg)
     {
@@ -54,14 +54,14 @@ private:
     {
         if (!has_goal_ || !has_odom_) return;
 
-        double dx = goal_.pose.position.x - odom_.pose.pose.position.x;
-        double dy = goal_.pose.position.y - odom_.pose.pose.position.y;
+        double dx = goal_.pose.position.x - odom_.pose.pose.position.x; // change in x position
+        double dy = goal_.pose.position.y - odom_.pose.pose.position.y; // change in y position
 
-        double distance = std::sqrt(dx*dx + dy*dy);
-        double target_angle = std::atan2(dy, dx);
+        double distance = std::sqrt(dx*dx + dy*dy); // square root distance to location
+        double target_angle = std::atan2(dy, dx); // tan -1(y/x)
 
-        double yaw = getYaw(odom_.pose.pose.orientation);
-        double angle_error = normalize(target_angle - yaw);
+        double yaw = getYaw(odom_.pose.pose.orientation); 
+        double angle_error = normalize(target_angle - yaw); 
 
         geometry_msgs::msg::Twist cmd;
 
@@ -92,7 +92,7 @@ private:
             return;
         }
 
-        cmd_pub_->publish(cmd);
+        cmd_pub_->publish(cmd); // publish the new velocity to /cmd_vel
 
     }
 
