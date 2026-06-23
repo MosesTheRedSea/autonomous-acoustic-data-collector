@@ -108,8 +108,8 @@ def generate_launch_description():
                         'sleep_duration': 3,
                         'start_sample': 4900,
                         'end_sample': 6000,
-                        'mic_device': 3,
-                        'speaker_device': 4,
+                        'mic_device': 5,
+                        'speaker_device': 8,
                     }],
                     output='screen'
     )           ),

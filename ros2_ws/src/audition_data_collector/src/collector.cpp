@@ -81,7 +81,7 @@ private:
       return;
     }
 
-    if (state != State:RECORDING) {
+    if (state != State::RECORDING) {
       RCLCPP_WARN(
           get_logger(),
           "Received recrding complete while not recording"
@@ -91,8 +91,7 @@ private:
 
     RCLCPP_INFO(
         get_logger(),
-        "Recording complete at waypoint [%s]",
-        current_waypoint->current_waypoint.c_str()
+        "Recording complete at waypoint"
     );
 
     state = State::IDLE;
@@ -110,7 +109,6 @@ private:
         // //proceed_pub->publish(proceed);
         
         // publishStatus();
-    }
   }
 
   /* 
