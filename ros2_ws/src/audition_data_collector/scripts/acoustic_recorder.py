@@ -4,7 +4,7 @@ import rclpy
 from rclpy.node import Node
 from std_msgs.msg import Bool, String
 from audition_msgs.msg import CollectionStatus
-
+import subprocess
 import os
 import time
 import numpy as np
@@ -13,6 +13,7 @@ import soundfile as sf
 from scipy.signal import fftconvolve
 from datetime import datetime
 from pathlib import Path
+import matplotlib.pyplot as plt
 import threading
 from scipy.signal import spectrogram
 
@@ -22,9 +23,9 @@ class AcousticRecorder(Node):
 
     def __init__(self):
 
-        super().__init__('acoustic_recorder_node')
+        super().__init__('acoustic_recorder')
 
-        self.declare_parameter('excitation_path', '')
+        self.declare_parameter('excitation_path', '/home/moses/moses-research/ros2-robot-audition-suite/excitation.wav')
         self.declare_parameter('output_dir', '/home/moses/audition_bags/acoustic')
 
         self.declare_parameter('dataset_directory', '/home/moses/audition_bags/acoustic')
@@ -34,12 +35,10 @@ class AcousticRecorder(Node):
         self.declare_parameter('sleep_duration', 3)
         self.declare_parameter('start_sample', 4900)
         self.declare_parameter('end_sample', 6000)
-        
-        # Blue Tooth Speaker - won't be needed since sound will play grom device itself.
-        self.declare_parameter('speaker_device', None)
 
-        # 16 Array Microphone
-        self.declare_parameter('mic_device', None)
+        # 18 Array Microphone
+        self.declare_parameter('mic_device', 1)
+        self.declare_parameter('speaker_device', 13)
 
         self.excitation_path = self.get_parameter('excitation_path').value
         self.output_dir = self.get_parameter('output_dir').value
@@ -53,13 +52,14 @@ class AcousticRecorder(Node):
 
         # Retreive the devices from the yaml file
         self.mic_device = self.get_parameter('mic_device').value
-        self.speaker_device = self.get_parameter('speaker_device').value 
+        self.speaker_device = self.get_parameter('speaker_device').value
 
         self.recording  = False
         self.current_waypoint = None
         self.excitation = None
         self.fs = None
 
+        self.room_directory = "nakadai-lab"
         self.load_excitation()
 
         # subscribers``
@@ -86,7 +86,6 @@ class AcousticRecorder(Node):
         self.excitation = excitation / np.max(np.abs(excitation))
         self.fs = fs
         self.get_logger().info(f'Excitation loaded — {len(excitation)} samples at {fs} Hz')
-
     def list_audio_devices(self):
         devices = sd.query_devices()
         self.get_logger().info('Available audio devices:')
@@ -96,44 +95,131 @@ class AcousticRecorder(Node):
     def waypoint_callback(self, msg):
         self.current_waypoint = msg
         self.get_logger().info(f'At waypoint: {msg.current_waypoint_label}')
-
-    def trigger_callback(self, msg):
-        if msg.data and not self.recording:
-            thread = threading.Thread(target=self.run_recording_session)
-            thread.daemon = True
-            thread.start()
-        elif not msg.data and self.recording:
-            self.get_logger().info('Trigger stopped — recording will finish current repeat')
     
     # When the Robot reaches the Waypoint - Operator has to enter in some key information
     def trigger_callback(self, msg):
 
+        if self.current_waypoint is None:
+            self.get_logger().warn("No waypoint received yet")
+            return
+
         if msg.data and not self.recording:
             self.get_logger().info("Waypoint reached — enter recording metadata")
 
-            room_directory = input("room-directory: ").strip()
-            excitation_path = input("excitation-path: ").strip()
-            occlusion_type = input("occlusion-type: ").strip()
-            occlusion_distance = input("occlusion-distance: ").strip()
-            occluded_type = input("occluded-type: ").strip()
-            occluded_distance = input("occluded-distance: ").strip()
-            base_filename = input("base-filename: ").strip()
+            # room_directory = input("room-directory: ").strip()
+            # excitation_path = input("excitation-path: ").strip()
+            # occlusion_type = input("occlusion-type: ").strip()
+            # occlusion_distance = input("occlusion-distance: ").strip()
+            # occluded_type = input("occluded-type: ").strip()
+            # occluded_distance = input("occluded-distance: ").strip()
+            # base_filename = input("base-filename: ").strip()
 
-            self.room_directory = room_directory
-            self.excitation_path = excitation_path
-            self.occlusion_type = occlusion_type
-            self.occlusion_distance = occlusion_distance
-            self.occluded_type = occluded_type
-            self.occluded_distance = occluded_distance
-            self.base_filename = base_filename
+            # self.room_directory = room_directory
+            # self.excitation_path = excitation_path
+            # self.occlusion_type = occlusion_type
+            # self.occlusion_distance = occlusion_distance
+            # self.occluded_type = occluded_type
+            # self.occluded_distance = occluded_distance
+            # self.base_filename = base_filename
 
-            self.record_directory = os.path.join(f"{dataset_directory}/{self.room_directory}/{self.occlusion_type}/{self.occluded_type}/{self.distance_dir}", self.recorded_filename) 
+            waypoint_label = self.current_waypoint.current_waypoint_label
 
+            self.object_map = {
+                "west_mid": {
+                    "occlusion_type": "wood",
+                    "occluded_type": "metal_ladder",
+                    "occlusion_distance": "0.0m",
+                    "occluded_distance": "0.5m"
+                },
+                "north_mid": {
+                    "occlusion_type": "foam",
+                    "occluded_type": "plastic_speaker",
+                    "occlusion_distance": "0.0m",
+                    "occluded_distance": "0.5m"
+                },
+                "east_mid": {
+                    "occlusion_type": "wood",
+                    "occluded_type": "foam_chair",
+                    "occlusion_distance": "0.0m",
+                    "occluded_distance": "0.5m"
+                },
+                "south_mid": {
+                    "occlusion_type": "foam",
+                    "occluded_type": "polyethylene_case",
+                    "occlusion_distance": "0.0m",
+                    "occluded_distance": "0.5m"
+                }
+            }
+
+            if waypoint_label in self.object_map:
+                metadata = self.object_map[waypoint_label]
+
+                self.occlusion_type = metadata["occlusion_type"]
+                self.occluded_type = metadata["occluded_type"]
+                self.occlusion_distance = metadata["occlusion_distance"]
+                self.occluded_distance = metadata["occluded_distance"]
+
+                self.distance_dir = "0"
+
+                self.base_filename = (
+                    f"{waypoint_label}_"
+                    f"{self.occlusion_type}_"
+                    f"{self.occluded_type}"
+                )
+
+            else:
+                self.get_logger().warn(f"No object mapping for {waypoint_label}")
+                return
+
+            self.distance_dir = (
+                f"{self.occlusion_distance}-"
+                f"{self.occluded_distance}"
+            ).strip()
+
+            self.record_directory = (
+                f"{self.dataset_directory}/"
+                f"{self.room_directory}/"
+                f"{self.occlusion_type}/"
+                f"{self.occluded_type}/"
+                f"{self.distance_dir}"
+            )
+
+            Path(self.record_directory).mkdir(
+                parents=True,
+                exist_ok=True
+            )
+            
             self.load_excitation()
 
             thread = threading.Thread(target=self.run_recording_session)
             thread.daemon = True
             thread.start()
+
+    def plot_ir(start_sample, end_sample, rir_cropped, i, save_dir):
+
+        # make sure folder exists
+        os.makedirs(save_dir, exist_ok=True)
+
+        plt.figure(figsize=(10, 4))
+        plt.plot(np.arange(start_sample, end_sample), rir_cropped)
+
+        plt.title(f"IR Segment (Mic 1) - Samples {start_sample} to {end_sample} - Recording {i + 1}")
+        plt.xlabel("Sample Index")
+        plt.ylabel("Amplitude")
+        plt.grid(True)
+        plt.tight_layout()
+
+        # 👉 SAVE FILE HERE
+        filename = os.path.join(save_dir, f"ir_plot_recording_{i+1}.png")
+        plt.savefig(filename, dpi=300)
+
+        # optional: still show it
+        plt.show()
+
+        # important: free memory
+        plt.close()
+
+        print(f"Saved plot to: {filename}")
 
     def run_recording_session(self):
         if self.excitation is None:
@@ -144,6 +230,7 @@ class AcousticRecorder(Node):
 
         waypoint_label = 'unknown'
         waypoint_id    = 0
+
         if self.current_waypoint:
             waypoint_label = self.current_waypoint.current_waypoint_label
             waypoint_id    = self.current_waypoint.current_waypoint_id
@@ -153,22 +240,8 @@ class AcousticRecorder(Node):
         #    f'waypoint_{waypoint_id}_{waypoint_label}',
         #    datetime.now().strftime('%Y%m%d_%H%M%S')
         #)
-        distance_dir = (f"{self.occlusion_distance}-"f"{self.occluded_distance}").strip()
 
-        session_dir = os.path.join(
-            self.dataset_directory,
-            self.room_directory,
-            self.occlusion_type,
-            self.occluded_type,
-            distance_dir
-        )
-
-        Path(session_dir).mkdir(
-             parents=True,
-             exist_ok=True
-        )
-
-
+        session_dir = self.record_directory
         Path(session_dir).mkdir(parents=True, exist_ok=True)
 
         self.get_logger().info(f'Starting acoustic session — {self.repeat} repeats')
@@ -181,44 +254,76 @@ class AcousticRecorder(Node):
             self.get_logger().info(f'Recording {i+1}/{self.repeat} — playing {duration:.2f}s excitation')
 
             status_msg = String()
+
             status_msg.data = f'RECORDING {i+1}/{self.repeat} at {waypoint_label}'
+
             self.status_pub.publish(status_msg)
 
             try:
 
-                recorded = sd.playrec(
-                    self.excitation,
+                # recorded = sd.playrec(
+                #     self.excitation,
+                #     samplerate=self.fs,
+                #     channels=self.channels,
+                #     device=(1, 13)
+                # )
+
+                # play excitation using system audio (Bluetooth-safe)
+                tmp_wav = self.excitation_path
+
+                subprocess.Popen(["aplay", tmp_wav, "-D", "default"])
+
+                # record simultaneously
+                recorded = sd.rec(
+                    int(len(self.excitation)),
                     samplerate=self.fs,
                     channels=self.channels,
-                    input_device=self.mic_device
+                    device=self.mic_device
                 )
 
+                # wait for playback duration
+                time.sleep(len(self.excitation) / self.fs + 0.3)
+
                 sd.wait()
+
             except Exception as e:
                 self.get_logger().error(f'Audio error: {e}')
                 break
 
             timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
             # wav_path  = os.path.join(session_dir, f'recording_{i+1}_{timestamp}.wav')
-        
-            wav_filename = (
+
+            recorded_filename = (
                 f"{timestamp}_"
                 f"{self.base_filename}_"
                 f"{i+1}.wav"
             )
 
-            wav_path = os.path.join(
-                session_dir,
-                wav_filename
+            recorded_path = os.path.join(
+                self.record_directory,
+                recorded_filename
             )
+<<<<<<< HEAD
             
             sf.write(wav_path, recorded, self.fs)
+=======
 
-            self.get_logger().info(f'Saved WAV: {wav_path}')
+            sf.write(recorded_path, recorded, self.fs)
+            
+            self.get_logger().info(f'Saved WAV: {recorded_path}')
+>>>>>>> 81b09293a3323dd4d75352676e7906a74f31ab4e
 
+            self.compute_and_save_ir(recorded, session_dir, i, timestamp)
+
+<<<<<<< HEAD
             self.compute_and_save_ir(recorded, session_dir, i, timestap)
 
 
+=======
+
+            start_sample = 21300
+            end_sample = 22000
+>>>>>>> 81b09293a3323dd4d75352676e7906a74f31ab4e
 
             if i < self.repeat - 1:
                 time.sleep(self.sleep_duration)
@@ -231,13 +336,22 @@ class AcousticRecorder(Node):
 
         self.complete_pub.publish(complete_msg)
 
-    def compute_and_save_ir(self, recorded, session_dir, repeat_index):
+    def compute_and_save_ir(self, recorded, session_dir, repeat_index, timestamp):
         inv_filter = self.excitation[::-1]
 
+<<<<<<< HEAD
         spectrogram_dir = os.path.join(session_dir, "spectrograms")
         os.makedirs(spectrogram_dir, exist_ok=True)
 
         for ch in range(min(recorded.shape[1], self.channels)):
+=======
+        if recorded.ndim == 1:
+            recorded = recorded[:, None]
+
+        num_ch = recorded.shape[1]
+
+        for ch in range(min(num_ch, self.channels)):
+>>>>>>> 81b09293a3323dd4d75352676e7906a74f31ab4e
             ir_full = fftconvolve(recorded[:, ch], inv_filter, mode='full')
             N       = len(self.excitation)
             ir_full = ir_full[N:N * 2]
@@ -252,7 +366,7 @@ class AcousticRecorder(Node):
             )
 
             ir_path = os.path.join(
-                session_dir,
+                self.record_directory,
                 ir_filename
             )
 
@@ -271,6 +385,7 @@ class AcousticRecorder(Node):
 
         self.get_logger().info(f'IR saved for {self.channels} channels — repeat {repeat_index+1}')
 
+<<<<<<< HEAD
 def save_spectrogram(ir, fs, save_dir, base_filename, timestamp, repeat_idx, ch):
     f, t, Sxx = spectrogram(
         ir,
@@ -310,6 +425,10 @@ def save_spectrogram(ir, fs, save_dir, base_filename, timestamp, repeat_idx, ch)
 
 def main(args=None):
     rclpy.init(args=args)
+=======
+def main(args=None):
+    rclpy.init(args=args)
+>>>>>>> 81b09293a3323dd4d75352676e7906a74f31ab4e
     node = AcousticRecorder()
     rclpy.spin(node)
     rclpy.shutdown()

@@ -74,7 +74,7 @@ def generate_launch_description():
             Node(
                 package='audition_data_collector',
                 executable='acoustic_recorder.py',
-                name='acoustic_recorder_node',
+                name='acoustic_recorder',
                 parameters=[acoustic_params, {'use_sim_time': False}],
                 output='screen'
             ),

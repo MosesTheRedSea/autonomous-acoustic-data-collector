@@ -30,7 +30,7 @@ private:
     bool has_odom_ = false;
 
     rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr cmd_pub_;
-    rclcpp::Publisher<std_msgs::msg::BOol>::SharedPtr goal_reached_pub;
+    rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr goal_reached_pub;
 
     rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr goal_sub_;
     rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr odom_sub_;
