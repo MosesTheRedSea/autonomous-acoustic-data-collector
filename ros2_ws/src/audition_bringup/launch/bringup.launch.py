@@ -1,16 +1,15 @@
-  import os
+import os
 from launch import LaunchDescription
 from launch.actions import TimerAction
 from launch_ros.actions import Node
 from ament_index_python.packages import get_package_share_directory
 
-
 def generate_launch_description():
 
-    collector_pkg = get_package_share_directory('audition_data_collector')
-    sim_pkg = get_package_share_directory("audition_sim")
+    bringup_pkg = get_package_share_directory('audition_bringup')
+    sim_pkg = get_package_share_directory('audition_sim')
 
-    waypoints_config = os.path.join(collector_pkg, 'config', 'real_waypoints.yaml')
+    waypoints_config = os.path.join(bringup_pkg, 'config', 'waypoints.yaml')
     acoustic_params = os.path.join(sim_pkg, 'config', 'acoustic_params.yaml')
 
     return LaunchDescription([
@@ -28,7 +27,7 @@ def generate_launch_description():
             }],
             output='screen'
         ),
-        
+
         TimerAction(period=2.0, actions=[
 
             Node(
@@ -59,18 +58,6 @@ def generate_launch_description():
                 output='screen'
             ),
 
-            """
-            Node(
-                package='audition_data_collector',
-                executable='recorder',
-                parameters=[{
-                    'output_dir': '/home/moses/audition_bags',
-                    'use_sim_time': False
-                }],
-                output='screen'
-            ),
-            """
-
             Node(
                 package='audition_data_collector',
                 executable='acoustic_recorder.py',
@@ -81,4 +68,4 @@ def generate_launch_description():
 
         ]),
 
-    ]) 
+    ])

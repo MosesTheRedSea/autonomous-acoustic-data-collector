@@ -1,7 +1,7 @@
-waypoint_collector:
+waypoint:
   ros__parameters:
     waypoints:
-
+    
       labels: [
         "west_mid",
         "west_top",
@@ -13,38 +13,8 @@ waypoint_collector:
         "south_left"
       ]
 
-      x: [
-        0.0,
-        0.0,
-        1.0,
-        2.0,
-        2.0,
-        2.0,
-        1.0,
-        0.0
-      ]
+      x: [0.0, 0.0, 1.0, 2.0, 2.0, 2.0, 1.0, 0.0]
 
-      y: [
-        2.0,
-        4.0,
-        4.0,
-        4.0,
-        2.0,
-        0.0,
-        0.0,
-        0.0
-      ]
+      y: [2.0, 4.0, 4.0, 4.0, 2.0, 0.0, 0.0, 0.0]
 
-      yaw: [
-        0.0,       # west wall, face into room (+x)
-        0.0,
-
-       -1.5708,    # north wall, face into room (-y)
-       -1.5708,
-
-        3.1416,    # east wall, face into room (-x)
-        3.1416,
-
-        1.5708,    # south wall, face into room (+y)
-        1.5708
-      ]
+      yaw: [0.0, 0.0, -1.5708, -1.5708, 3.1416, 3.1416, 1.5708, 1.5708]
