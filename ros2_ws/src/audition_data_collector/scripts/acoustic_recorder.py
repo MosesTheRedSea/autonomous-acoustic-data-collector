@@ -195,31 +195,37 @@ class AcousticRecorder(Node):
             thread.daemon = True
             thread.start()
 
-    def plot_ir(start_sample, end_sample, rir_cropped, i, save_dir):
-
-        # make sure folder exists
+    def plot_ir(self, start_sample, end_sample, rir_cropped, repeat_idx, ch, save_dir, timestamp):
         os.makedirs(save_dir, exist_ok=True)
 
         plt.figure(figsize=(10, 4))
-        plt.plot(np.arange(start_sample, end_sample), rir_cropped)
 
-        plt.title(f"IR Segment (Mic 1) - Samples {start_sample} to {end_sample} - Recording {i + 1}")
+        plt.plot(
+            np.arange(start_sample, end_sample),
+            rir_cropped
+        )
+
+        plt.title(
+            f"IR Segment (Mic {ch+1}) "
+            f"Samples {start_sample}-{end_sample} "
+            f"Recording {repeat_idx+1}"
+        )
+
         plt.xlabel("Sample Index")
         plt.ylabel("Amplitude")
         plt.grid(True)
         plt.tight_layout()
 
-        # 👉 SAVE FILE HERE
-        filename = os.path.join(save_dir, f"ir_plot_recording_{i+1}.png")
+        filename = os.path.join(
+            save_dir,
+            f"{timestamp}_{self.base_filename}_"
+            f"ir_repeat{repeat_idx+1}_mic{ch+1}.png"
+        )
+
         plt.savefig(filename, dpi=300)
-
-        # optional: still show it
-        plt.show()
-
-        # important: free memory
         plt.close()
 
-        print(f"Saved plot to: {filename}")
+        self.get_logger().info(f"Saved IR plot: {filename}")
 
     def run_recording_session(self):
         if self.excitation is None:
@@ -303,27 +309,12 @@ class AcousticRecorder(Node):
                 self.record_directory,
                 recorded_filename
             )
-<<<<<<< HEAD
-            
-            sf.write(wav_path, recorded, self.fs)
-=======
 
             sf.write(recorded_path, recorded, self.fs)
             
             self.get_logger().info(f'Saved WAV: {recorded_path}')
->>>>>>> 81b09293a3323dd4d75352676e7906a74f31ab4e
 
             self.compute_and_save_ir(recorded, session_dir, i, timestamp)
-
-<<<<<<< HEAD
-            self.compute_and_save_ir(recorded, session_dir, i, timestap)
-
-
-=======
-
-            start_sample = 21300
-            end_sample = 22000
->>>>>>> 81b09293a3323dd4d75352676e7906a74f31ab4e
 
             if i < self.repeat - 1:
                 time.sleep(self.sleep_duration)
@@ -337,28 +328,29 @@ class AcousticRecorder(Node):
         self.complete_pub.publish(complete_msg)
 
     def compute_and_save_ir(self, recorded, session_dir, repeat_index, timestamp):
-        inv_filter = self.excitation[::-1]
+        inv_filter = self.excitation[::-1] / np.sum(self.excitation**2)
 
-<<<<<<< HEAD
-        spectrogram_dir = os.path.join(session_dir, "spectrograms")
-        os.makedirs(spectrogram_dir, exist_ok=True)
+        ir_plot_dir = os.path.join(session_dir, "ir_plots")
+        os.makedirs(ir_plot_dir, exist_ok=True)
 
         for ch in range(min(recorded.shape[1], self.channels)):
-=======
-        if recorded.ndim == 1:
-            recorded = recorded[:, None]
 
-        num_ch = recorded.shape[1]
+            # full deconvolution
+            ir_full = fftconvolve(
+                recorded[:, ch],
+                inv_filter,
+                mode='full'
+            )
 
-        for ch in range(min(num_ch, self.channels)):
->>>>>>> 81b09293a3323dd4d75352676e7906a74f31ab4e
-            ir_full = fftconvolve(recorded[:, ch], inv_filter, mode='full')
-            N       = len(self.excitation)
-            ir_full = ir_full[N:N * 2]
-            ir      = ir_full[self.start_sample:self.end_sample]
+            N = len(self.excitation)
 
-            # ir_path   = os.path.join(session_dir, f'ir_repeat{repeat_index+1}_mic{ch+1}.npy')
-                
+            # align around excitation length
+            ir_full = ir_full[N:N*2]
+
+            # crop useful region
+            ir = ir_full[self.start_sample:self.end_sample]
+
+            # save .npy
             ir_filename = (
                 f"{timestamp}_"
                 f"{self.base_filename}_"
@@ -371,64 +363,27 @@ class AcousticRecorder(Node):
             )
 
             np.save(ir_path, ir)
+
+
+            # may take up too much space 
             
-            spec_path = save_spectrogram(
-                ir,
-                self.fs,
-                spectrogram_dir,
-                self.base_filename,
-                timestamp,
-                repeat_index,
-                ch
-            )
+            # save IR plot
+            # self.plot_ir(
+            #     self.start_sample,
+            #     self.end_sample,
+            #     ir,
+            #     repeat_index,
+            #     ch,
+            #     ir_plot_dir,
+            #     timestamp
+            # )
 
+        self.get_logger().info(
+            f'IR saved for {self.channels} channels — repeat {repeat_index+1}'
+        )
 
-        self.get_logger().info(f'IR saved for {self.channels} channels — repeat {repeat_index+1}')
-
-<<<<<<< HEAD
-def save_spectrogram(ir, fs, save_dir, base_filename, timestamp, repeat_idx, ch):
-    f, t, Sxx = spectrogram(
-        ir,
-        fs=fs,
-        nperseg=128,
-        noverlap=64
-    )
-
-    plt.figure(figsize=(10, 4))
-    plt.pcolormesh(
-        t,
-        f,
-        10 * np.log10(Sxx + 1e-12),
-        shading='gouraud'
-    )
-
-    plt.ylabel("Frequency [Hz]")
-    plt.xlabel("Time [sec]")
-    plt.title(
-        f"IR Spectrogram (Mic {ch+1}) - Recording {repeat_idx+1}"
-    )
-    plt.colorbar(label="Power [dB]")
-    plt.tight_layout()
-
-    spec_filename = (
-        f"{timestamp}_"
-        f"{base_filename}_"
-        f"spectrogram_repeat{repeat_idx+1}_mic{ch+1}.png"
-    )
-
-    spec_path = os.path.join(save_dir, spec_filename)
-
-    plt.savefig(spec_path, dpi=300)
-    plt.close()
-
-    return spec_path
-
-def main(args=None):
-    rclpy.init(args=args)
-=======
 def main(args=None):
     rclpy.init(args=args)
->>>>>>> 81b09293a3323dd4d75352676e7906a74f31ab4e
     node = AcousticRecorder()
     rclpy.spin(node)
     rclpy.shutdown()

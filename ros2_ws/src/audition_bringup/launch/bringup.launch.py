@@ -50,7 +50,11 @@ def generate_launch_description():
                 parameters=[{'use_sim_time': False}],
                 output='screen'
             ),
-
+            Node(
+                package='rover_twist_bridge',
+                executable='cmd_to_twist',
+                name='cmd_to_twist'
+            ),
             Node(
                 package='audition_data_collector',
                 executable='handler',

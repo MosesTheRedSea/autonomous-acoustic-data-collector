@@ -17,7 +17,7 @@ class OdomIntegrator(Node):
 
         self.declare_parameter('start_x', 0.0)
         self.declare_parameter('start_y', 0.0)
-        self.declare_parameter('start_yaw', 0.0)
+        self.declare_parameter('start_yaw', 1.5708)
         self.declare_parameter('odom_frame', 'odom')
         self.declare_parameter('base_frame', 'base_footprint')
 
