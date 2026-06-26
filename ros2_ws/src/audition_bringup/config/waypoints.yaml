@@ -14,8 +14,9 @@ waypoint:
       ]
 
       x: [0.0, 0.0, 1.0, 2.0, 2.0, 2.0, 1.0, 0.0]
-
       y: [2.0, 4.0, 4.0, 4.0, 2.0, 0.0, 0.0, 0.0]
+
+      # Parameters are written in pairs (x, y)
 
       yaw: [
         1.5708,   # west_mid -> continue +Y after ladder recording

@@ -21,7 +21,7 @@ def generate_launch_description():
             parameters=[{
                 'start_x': 0.0,
                 'start_y': 0.0,
-                'start_yaw': 0.0,
+                'start_yaw': 1.5078 , # I was resetting the start_yaw to zero in my node launch
                 'odom_frame': 'odom',
                 'base_frame': 'base_footprint',
             }],
@@ -50,11 +50,7 @@ def generate_launch_description():
                 parameters=[{'use_sim_time': False}],
                 output='screen'
             ),
-            Node(
-                package='rover_twist_bridge',
-                executable='cmd_to_twist',
-                name='cmd_to_twist'
-            ),
+
             Node(
                 package='audition_data_collector',
                 executable='handler',
@@ -73,3 +69,28 @@ def generate_launch_description():
         ]),
 
     ])
+
+"""
+Launch Steps
+
+ros2 launch audition_bringup bringup.launch.py
+
+./launch_data_collector.sh
+
+# Should run autonomously on it's own
+
+"""
+
+# acoustic_recorder
+"""
+# terminal 1
+ros2 run audition_data_collector acoustic_recorder.py
+
+# terminal 2
+ros2 topic pub /current_waypoint audition_msgs/msg/CollectionStatus \
+"{current_waypoint_id: 1, current_waypoint_label: 'west_mid'}" --once
+
+# terminal 3
+ros2 topic pub /start_record std_msgs/msg/Bool "{data: true}" --once"
+
+"""
