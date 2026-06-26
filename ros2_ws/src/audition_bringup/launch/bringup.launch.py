@@ -21,7 +21,7 @@ def generate_launch_description():
             parameters=[{
                 'start_x': 0.0,
                 'start_y': 0.0,
-                'start_yaw': 1.5078 , # I was resetting the start_yaw to zero in my node launch
+                'start_yaw': 1.5708 , # I was resetting the start_yaw to zero in my node launch
                 'odom_frame': 'odom',
                 'base_frame': 'base_footprint',
             }],
@@ -82,6 +82,7 @@ ros2 launch audition_bringup bringup.launch.py
 """
 
 # acoustic_recorder
+
 """
 # terminal 1
 ros2 run audition_data_collector acoustic_recorder.py

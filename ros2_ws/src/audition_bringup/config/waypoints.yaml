@@ -1,52 +1,23 @@
-waypoint:
+
+waypoint_manager_node:
+
   ros__parameters:
+
     waypoints:
 
-      labels: [
-        "west_mid",
-        "west_top",
-        "north_mid",
-        "north_right",
-        "east_mid",
-        "east_bottom",
-        "south_mid",
-        "south_left"
-      ]
+      labels: ["west_mid", "west_top", "north_mid", "north_right", "east_mid", "east_bottom", "south_mid", "south_left"]
 
       x: [0.0, 0.0, 1.0, 2.0, 2.0, 2.0, 1.0, 0.0]
+
       y: [2.0, 4.0, 4.0, 4.0, 2.0, 0.0, 0.0, 0.0]
-
-      # Parameters are written in pairs (x, y)
-
+      
       yaw: [
-        1.5708,   # west_mid -> continue +Y after ladder recording
-        0.0,      # west_top -> turn right, move +X
-        0.0,      # north_mid -> continue +X after speaker recording
-        -1.5708,  # north_right -> turn down, move -Y
-        -1.5708,  # east_mid -> continue -Y
-        3.1416,   # east_bottom -> turn left, move -X
-        3.1416,   # south_mid -> continue -X
-        1.5708    # south_left -> turn up, reset loop
+        0.0,       # west_mid (0,2) — RECORD, face east (toward center)
+        0.0,       # west_top (0,4) — corner, face east for next leg
+        -1.5708,   # north_mid (1,4) — RECORD, face south (toward center)
+        -1.5708,   # north_right (2,4) — corner, face south for next leg
+        3.1416,    # east_mid (2,2) — RECORD, face west (toward center)
+        3.1416,    # east_bottom (2,0) — corner, face west for next leg
+        1.5708,    # south_mid (1,0) — RECORD, face north (toward center)
+        1.5708     # south_left (0,0) — corner, face north to loop back
       ]
-
-
-# waypoint:
-#   ros__parameters:
-#     waypoints:
-    
-#       labels: [
-#         "west_mid",
-#         "west_top",
-#         "north_mid",
-#         "north_right",
-#         "east_mid",
-#         "east_bottom",
-#         "south_mid",
-#         "south_left"
-#       ]
-
-#       x: [0.0, 0.0, 1.0, 2.0, 2.0, 2.0, 1.0, 0.0]
-
-#       y: [2.0, 4.0, 4.0, 4.0, 2.0, 0.0, 0.0, 0.0]
-
-#       yaw: [0.0, 0.0, -1.5708, -1.5708, 3.1416, 3.1416, 1.5708, 1.5708]
