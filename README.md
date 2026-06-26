@@ -179,8 +179,20 @@ waypoints:
 
 ```bash
 colcon build --packages-select audition_data_collector
+source /opt/ros/foxy/setup.bash
+
 source install/setup.bash
-ros2 launch audition_data_collector rover_bringup.launch.py
+ros2 launch audition_bringup bringup.launch.py
+```
+
+```bash
+source /opt/ros/foxy/setup.bash
+source install/setup.bash
+
+cd scripts
+
+./launch_data_collect.sh
+tmux attach -t rover
 ```
 
 The robot will autonomously:
