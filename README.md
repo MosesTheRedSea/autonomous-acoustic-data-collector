@@ -160,10 +160,19 @@ Open `room_map.pgm` and identify the x/y coordinates of each collection point. U
 
 ```yaml
 waypoints:
-  labels: ["position_1", "position_2", "position_3", "position_4"]
-  x: [1.5, -2.5, -1.5,  2.5]
-  y: [2.5,  1.5, -2.5, -1.5]
-  yaw: [0.0, 0.0, 0.0, 0.0]
+  labels: [
+    "west_mid",
+    "west_top",
+    "north_mid",
+    "north_right",
+    "east_mid",
+    "east_bottom",
+    "south_mid",
+    "south_left"
+  ]
+  x: [0.0, 0.0, 1.0, 2.0, 2.0, 2.0, 1.0, 0.0]
+  y: [2.0, 4.0, 4.0, 4.0, 2.0, 0.0, 0.0, 0.0]
+  yaw: [1.5708, 0.0, 0.0, -1.5708, -1.5708, 3.1416, 3.1416, 1.5708]
 ```
 
 ### Step 6 — Run autonomous data collection
