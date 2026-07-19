@@ -36,7 +36,7 @@ source install/setup.bash
 ros2 launch audition_sim sim.launch.py
 ```
 
-### Run autonomous Data collection
+### Run Autonomous Data Collection
 
 ```bash
 colcon build --packages-select audition_data_collector
