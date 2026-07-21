@@ -1,4 +1,5 @@
-#  ROS2 Robot Audition Suite
+#  Acoustic Robotic Data System
+
 > Developed at the **Institute of Science Tokyo**, Japan
 
 A research-oriented ROS2 framework for autonomous acoustic and spatial data collection using mobile robots.
