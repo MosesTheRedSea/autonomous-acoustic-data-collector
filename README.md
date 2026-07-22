@@ -1,4 +1,4 @@
-#  Acoustic Robotic Data System
+#  Autonomous Acoustic Data Collector
 
 > Developed at the **Institute of Science Tokyo**, Japan
 
